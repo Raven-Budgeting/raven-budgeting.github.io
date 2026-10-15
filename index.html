@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    Replaced by the value of `flutter build web --base-href`. The site is
+    served from the root of its own origin, so scripts/build-web.sh passes "/".
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <!--
+    The page holds a household's whole ledger and talks to nothing but its own
+    origin. Everything it loads is served beside it, so the policy can say so:
+    no third-party script, font, image or connection of any kind, and no eval.
+
+    'wasm-unsafe-eval' is the one allowance, and it is narrower than it reads:
+    it permits compiling WebAssembly (CanvasKit, and the app's own Rust), not
+    JavaScript eval. Workers are allowed from blob: because flutter_rust_bridge
+    starts its worker pool from generated blob URLs; a blob worker inherits
+    this policy, so it cannot fetch anything the page could not.
+    'unsafe-inline' for styles is there because Flutter's engine adds <style>
+    elements at run time and the browser refuses them without it (tried). It
+    applies to CSS only, never to script.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://raven-relay.raven-budgeting.workers.dev wss://raven-relay.raven-budgeting.workers.dev; worker-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+  <!-- Nothing here links out, but if anything ever does, it says nothing about where it came from. -->
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="A local-first expense tracker and budgeting app.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Raven Budgeting">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Raven Budgeting</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!--
+    The Rust half of the app, loaded as ordinary same-origin scripts before
+    Flutter starts. flutter_rust_bridge would otherwise load it itself, through
+    `new Function(...)`, which this page's policy forbids. See frb_boot.js and
+    `startRust` in lib/src/browser/browser_web.dart.
+  -->
+  <script src="pkg/accounting_bridge.js"></script>
+  <script src="frb_boot.js"></script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
